@@ -2,10 +2,12 @@ package com.sebastianlundquist.bluetoothapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -37,6 +39,24 @@ public class MainActivity extends AppCompatActivity {
 	};
 
 	public void search(View view) {
+		if (bluetoothAdapter == null) {
+			new AlertDialog.Builder(MainActivity.this)
+					.setIcon(android.R.drawable.ic_dialog_alert)
+					.setTitle("Bluetooth Not Supported")
+					.setMessage("This device does not support Bluetooth. Try another device.")
+					.setNegativeButton("Cancel", null)
+					.show();
+			return;
+		}
+		else if (!bluetoothAdapter.isEnabled()) {
+			new AlertDialog.Builder(MainActivity.this)
+					.setIcon(android.R.drawable.ic_dialog_alert)
+					.setTitle("Bluetooth Disabled")
+					.setMessage("Bluetooth is disabled. Please enable Bluetooth.")
+					.setPositiveButton("OK", null)
+					.show();
+			return;
+		}
 		statusTextView.setText(R.string.searching);
 		searchButton.setEnabled(false);
 		bluetoothAdapter.startDiscovery();
