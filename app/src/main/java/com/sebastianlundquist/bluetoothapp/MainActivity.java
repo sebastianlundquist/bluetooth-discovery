@@ -17,15 +17,20 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
 	ListView deviceListView;
 	TextView statusTextView;
 	Button searchButton;
+	ArrayList<String> bluetoothDevices = new ArrayList<>();
+	ArrayAdapter adapter;
 
 	BluetoothAdapter bluetoothAdapter;
 
@@ -45,6 +50,13 @@ public class MainActivity extends AppCompatActivity {
 				String address = device.getAddress();
 				String rssi = Integer.toString(intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE));
 				Log.i("Device Found", "Name: " + name + ", Address: " + address + ", RSSI: " + rssi);
+				if (name == null || name.equals("")) {
+					bluetoothDevices.add(address + " - RSSI = " + rssi + "dBm");
+				}
+				else {
+					bluetoothDevices.add(name + " - RSSI = " + rssi + "dBm");
+				}
+				adapter.notifyDataSetChanged();
 			}
 		}
 	};
@@ -93,6 +105,8 @@ public class MainActivity extends AppCompatActivity {
 		deviceListView = findViewById(R.id.deviceListView);
 		statusTextView = findViewById(R.id.statusTextView);
 		searchButton = findViewById(R.id.searchButton);
+		adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, bluetoothDevices);
+		deviceListView.setAdapter(adapter);
 
 		bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
