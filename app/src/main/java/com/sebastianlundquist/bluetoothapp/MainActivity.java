@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 	TextView statusTextView;
 	Button searchButton;
 	ArrayList<String> bluetoothDevices = new ArrayList<>();
+	ArrayList<String> addresses = new ArrayList<>();
 	ArrayAdapter adapter;
 
 	BluetoothAdapter bluetoothAdapter;
@@ -50,13 +51,18 @@ public class MainActivity extends AppCompatActivity {
 				String address = device.getAddress();
 				String rssi = Integer.toString(intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE));
 				Log.i("Device Found", "Name: " + name + ", Address: " + address + ", RSSI: " + rssi);
-				if (name == null || name.equals("")) {
-					bluetoothDevices.add(address + " - RSSI = " + rssi + "dBm");
+				if (!addresses.contains(address)) {
+					addresses.add(address);
+					String deviceString = "";
+					if (name == null || name.equals("")) {
+						deviceString = address + " - RSSI = " + rssi + "dBm";
+					}
+					else {
+						deviceString = name + " - RSSI = " + rssi + "dBm";
+					}
+					bluetoothDevices.add(deviceString);
+					adapter.notifyDataSetChanged();
 				}
-				else {
-					bluetoothDevices.add(name + " - RSSI = " + rssi + "dBm");
-				}
-				adapter.notifyDataSetChanged();
 			}
 		}
 	};
@@ -82,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
 		}
 		statusTextView.setText(R.string.searching);
 		searchButton.setEnabled(false);
+		bluetoothDevices.clear();
+		addresses.clear();
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {  // Only ask for these permissions on runtime when running Android 6.0 or higher
 			switch (ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
 				case PackageManager.PERMISSION_DENIED:
