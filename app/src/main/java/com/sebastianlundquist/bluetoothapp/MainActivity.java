@@ -1,15 +1,19 @@
 package com.sebastianlundquist.bluetoothapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -59,6 +63,18 @@ public class MainActivity extends AppCompatActivity {
 		}
 		statusTextView.setText(R.string.searching);
 		searchButton.setEnabled(false);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {  // Only ask for these permissions on runtime when running Android 6.0 or higher
+			switch (ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
+				case PackageManager.PERMISSION_DENIED:
+					if (ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+						ActivityCompat.requestPermissions(MainActivity.this,
+								new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+					}
+					break;
+				case PackageManager.PERMISSION_GRANTED:
+					break;
+			}
+		}
 		bluetoothAdapter.startDiscovery();
 	}
 
